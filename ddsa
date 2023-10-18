@@ -1,0 +1,122 @@
+[1mdiff --git a/README.MD b/README.MD[m
+[1mindex 3a17303..48e05e2 100644[m
+[1m--- a/README.MD[m
+[1m+++ b/README.MD[m
+[36m@@ -1,8 +1,7 @@[m
+ # Guia[m
+ [m
+ o caminho do meu projeto no lab da escola é[m
+[31m- cd /Z/LIP1/workspace[m
+[31m-ou [m
+[31m-\Z\LIP1\workspace[m
+[32m+[m[32m cd /Z/LIP1/workspace/crud[m
+[32m+[m
+ [m
+ para mapear o metodo precisa estar anotado adequadamente e a classe desse metodo precisa estar anotada com anotacao de controller[m
+\ No newline at end of file[m
+[1mdiff --git a/src/main/java/br/com/belval/crud/controller/ProdutoController.java b/src/main/java/br/com/belval/crud/controller/ProdutoController.java[m
+[1mindex c0f0b12..319203a 100644[m
+[1m--- a/src/main/java/br/com/belval/crud/controller/ProdutoController.java[m
+[1m+++ b/src/main/java/br/com/belval/crud/controller/ProdutoController.java[m
+[36m@@ -2,6 +2,7 @@[m [mpackage br.com.belval.crud.controller;[m
+ [m
+ import java.util.ArrayList;[m
+ import java.util.List;[m
+[32m+[m[32mimport java.util.ListIterator;[m
+ [m
+ import org.springframework.stereotype.Controller;[m
+ import org.springframework.ui.Model;[m
+[36m@@ -19,7 +20,21 @@[m [mpublic class ProdutoController {[m
+ 	private static int proxId = 1;[m
+ [m
+ 	@GetMapping("/produto/novo")[m
+[31m-	public String novo() {[m
+[32m+[m	[32m public String novo(Model model) {[m
+[32m+[m	[32mmodel.addAttribute("produto",  new Produto());[m
+[32m+[m		[32mreturn "produto";[m
+[32m+[m	[32m}[m
+[32m+[m	[32m@GetMapping("/produto/{id}/edit")[m
+[32m+[m	[32mpublic String editar (@PathVariable int id,Model model) {[m
+[32m+[m[41m		[m
+[32m+[m		[32mProduto produto = buscarPorid(id);[m
+[32m+[m[41m		[m
+[32m+[m		[32mif(produto ==null) {[m
+[32m+[m			[32mreturn "produto-nao-encontrado";[m
+[32m+[m		[32m}[m
+[32m+[m[41m		[m
+[32m+[m		[32mmodel.addAttribute("produto", produto);[m
+[32m+[m[41m		[m
+ 		return "novo-produto";[m
+ 	}[m
+ 	[m
+[36m@@ -27,6 +42,13 @@[m [mpublic class ProdutoController {[m
+ 	public ModelAndView novo(Produto produto) {[m
+ 		ModelAndView modelAndView = new ModelAndView("novo-produto-criado");[m
+ 		[m
+[32m+[m		[32mif (produto.getId()== 0) {[m
+[32m+[m			[32mproduto.setId(proxId++);[m
+[32m+[m			[32mlista.add(produto);[m
+[32m+[m		[32m} else {[m
+[32m+[m			[32mextracted(produto);[m
+[32m+[m		[32m}[m
+[32m+[m[41m			[m
+ 		produto.setId(proxId++);[m
+ 		[m
+ 		lista.add(produto);[m
+[36m@@ -34,6 +56,16 @@[m [mpublic class ProdutoController {[m
+ 		modelAndView.addObject("novoProduto", produto);[m
+ 		return modelAndView;[m
+ 	}[m
+[32m+[m	[32mprivate void extracted(Produto produto) {[m
+[32m+[m		[32mListIterator<Produto> it =lista.listIterator();[m
+[32m+[m		[32mwhile(it.hasNext()) {[m
+[32m+[m			[32mProduto encontrado = it.next();[m
+[32m+[m			[32mif (encontrado.getId() == produto.getId()) {[m
+[32m+[m				[32mit.remove();[m
+[32m+[m				[32mit.add(produto);[m
+[32m+[m			[32m}[m
+[32m+[m		[32m}[m
+[32m+[m	[32m}[m
+ [m
+ 	@GetMapping("/produto/list")[m
+ 	public String list(Model model) {[m
+[1mdiff --git a/src/main/resources/application.properties b/src/main/resources/application.properties[m
+[1mdeleted file mode 100644[m
+[1mindex 8b13789..0000000[m
+[1m--- a/src/main/resources/application.properties[m
+[1m+++ /dev/null[m
+[36m@@ -1 +0,0 @@[m
+[31m-[m
+[1mdiff --git a/src/main/resources/templates/novo-produto.html b/src/main/resources/templates/novo-produto.html[m
+[1mdeleted file mode 100644[m
+[1mindex 426cf7e..0000000[m
+[1m--- a/src/main/resources/templates/novo-produto.html[m
+[1m+++ /dev/null[m
+[36m@@ -1,27 +0,0 @@[m
+[31m-<!DOCTYPE html>[m
+[31m-<html>[m
+[31m-	<head>[m
+[31m-		<title>Novo Produto</title>[m
+[31m-		<meta charset="utf-8">[m
+[31m-	</head>[m
+[31m-	<body>[m
+[31m-		<h1>Novo Produto</h1>[m
+[31m-	[m
+[31m-		<form action="/produto/novo" method="post">[m
+[31m-		[m
+[31m-			<input type="hidden" name="id" value="0"> <br>[m
+[31m-	[m
+[31m-			<span for="nome">Nome:</span>[m
+[31m-			<input type="text" name="nome" > <br>[m
+[31m-			[m
+[31m-			<span for="descricao">Descrição:</span>[m
+[31m-			<input type="text" name="descricao"> <br>[m
+[31m-			[m
+[31m-			<span for="preco">Preço:</span>[m
+[31m-			<input type="text" name="preco" value="0.00"> <br>[m
+[31m-			[m
+[31m-			<input type="submit" value="Enviar">[m
+[31m-		</form>[m
+[31m-		[m
+[31m-	</body>[m
+[31m-</html>[m
